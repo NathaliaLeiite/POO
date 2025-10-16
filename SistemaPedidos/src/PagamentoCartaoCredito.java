@@ -9,7 +9,10 @@ public class PagamentoCartaoCredito implements IPagamento {
         if(valor<200.0){
             System.out.println("Pagamento feito com sucesso\n");
             return true;
-        }else{
+        }else if(valor<5000){
+            return true;
+        }
+        else{
             System.out.println("Deu errado :(\n");
             return false;
         }

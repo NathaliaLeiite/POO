@@ -14,18 +14,51 @@ public class Pedido{
         this.metodoPagamento = metodoPagamento;
     }
 
-     public void adicionarItem(Produto p, int q){
-        ItemPedido item= new ItemPedido(p, q);
-        itens.add(item);
+    public void adicionarItem(Produto p, int q) {
+        for (ItemPedido item : itens) {
+            if (item.getProduto().equals(p)) {
+                // se o produto já existe, soma a quantidade
+                int novaQuantidade = item.getQuantidade() + q;
+                item.setQuantidade(novaQuantidade);
+                return;
+            }
+        }
+        // se não existir, cria um novo item e adiciona
+        itens.add(new ItemPedido(p, q));
     }
 
-    public double calcularTotal(){
-        double t=0.0;
-        for(ItemPedido item: itens){
-            t+= item.getSubtotal();
+    public void removerItem(ItemPedido item) {
+        itens.remove(item);
+    }
+
+
+    public double calcularTotal() {
+        double t = 0.0;
+        for (ItemPedido item : itens) {
+            t += item.getSubtotal();
         }
         return t;
+    }
 
+
+    public void aplicarDesconto(double desconto) {
+        for (ItemPedido item : itens) {
+            double precoAtual = item.getProduto().getPreco();
+            double novoPreco = precoAtual - desconto;
+            if (novoPreco < 0) novoPreco = 0;
+            item.getProduto().setPreco(novoPreco);
+        }
+    }
+
+    public boolean confirmarPedido() {
+        if (metodoPagamento == null) {
+            return false;
+        }
+
+        double valorTotal = calcularTotal();
+        boolean aprovado = metodoPagamento.processarPagamento(valorTotal);
+
+        return aprovado;
     }
 
     public void processar(){
